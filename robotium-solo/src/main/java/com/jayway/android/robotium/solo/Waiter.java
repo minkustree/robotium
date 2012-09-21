@@ -81,6 +81,7 @@ class Waiter {
 			if(currentActivity != null && currentActivity.getClass().getSimpleName().equals(name))
 				return true;
 
+			// sleep and get next activity, in one method call!
 			currentActivity = activityUtils.getCurrentActivity(true);
 		}
 		return false;
@@ -99,9 +100,6 @@ class Waiter {
 		boolean foundMatchingView;
 
 		while(true){
-			if(sleep)
-				sleeper.sleep();
-
 			foundMatchingView = searcher.searchFor(uniqueViews, viewClass, index);
 
 			if(foundMatchingView)
@@ -112,6 +110,9 @@ class Waiter {
 
 			if(!scroll)
 				return false;
+			
+			if(sleep)
+				sleeper.sleep();
 		}
 	}
 
@@ -130,16 +131,22 @@ class Waiter {
 		final long endTime = SystemClock.uptimeMillis() + timeout;
 		boolean foundMatchingView;
 
-		while (SystemClock.uptimeMillis() < endTime) {
-			sleeper.sleep();
-
-			foundMatchingView =  searcher.searchFor(uniqueViews, viewClass, index);
+		while (SystemClock.uptimeMillis() <= endTime) {
+			foundMatchingView = searcher.searchFor(uniqueViews, viewClass, index);
 
 			if(foundMatchingView)
 				return true;
 
-			if(scroll) 
+			if(scroll) {
 				scroller.scroll(Scroller.DOWN);
+				// check again after scrolling, no waiting
+				if (searcher.searchFor(uniqueViews, viewClass, index)) {
+					return true;
+				}
+			}
+			// wait at the end of the loop, not the start, in case view is 
+			// already present.
+			sleeper.sleep();
 		}
 		return false;
 	}
@@ -209,7 +216,6 @@ class Waiter {
 		long endTime = SystemClock.uptimeMillis() + timeout;
 
 		while (SystemClock.uptimeMillis() < endTime) {
-			sleeper.sleep();
 
 			final boolean foundAnyMatchingView = searcher.searchFor(view);
 
@@ -217,8 +223,15 @@ class Waiter {
 				return true;
 			}
 
-			if(scroll) 
+			if(scroll) {
 				scroller.scroll(Scroller.DOWN);
+				// check again before we sleep
+				if (searcher.searchFor(view)) {
+					return true;
+				}
+			}
+			// finally, sleep before trying again soon.
+			sleeper.sleep();
 		}
 		return false;
 	}
@@ -234,7 +247,6 @@ class Waiter {
 		ArrayList<View> views = new ArrayList<View>();
 		long endTime = SystemClock.uptimeMillis() + SMALLTIMEOUT;
 		while (SystemClock.uptimeMillis() <= endTime) {
-			sleeper.sleep();
 			views = viewFetcher.getAllViews(false);
 			for (View v : views) {
 				if (v.getId() == id) {
@@ -242,6 +254,8 @@ class Waiter {
 					return v;
 				}
 			}
+			// sleep last, in case view is already visible
+			sleeper.sleep();
 		}
 		return null;
 	}
@@ -317,20 +331,19 @@ class Waiter {
 	public boolean waitForText(String text, int expectedMinimumNumberOfMatches, long timeout, boolean scroll, boolean onlyVisible) {
 		final long endTime = SystemClock.uptimeMillis() + timeout;
 
-		while (true) {
-			final boolean timedOut = SystemClock.uptimeMillis() > endTime;
-			if (timedOut){
-				return false;
-			}
-
-			sleeper.sleep();
-
+		while (SystemClock.uptimeMillis() <= endTime) {
 			final boolean foundAnyTextView = searcher.searchFor(TextView.class, text, expectedMinimumNumberOfMatches, scroll, onlyVisible);
 
 			if (foundAnyTextView){
 				return true;
 			}
+			
+			// finally, sleep to give the text a chance to appear.
+			sleeper.sleep();
 		}
+		// if we reach here, we've timed out before we found what we were 
+		// looking for.
+		return false;
 	}
 
 	/**
@@ -388,6 +401,8 @@ class Waiter {
 
 			if(getFragment(tag, id) != null)
 				return true;
+			// nothing found, so sleep until we try again
+			sleeper.sleep();
 		}
 		return false;
 	}
