@@ -171,7 +171,6 @@ class RobotiumUtils {
 	public void takeScreenshot(final View view, final String name) {
 		activityUtils.getCurrentActivity(false).runOnUiThread(new Runnable() {
 
-			@Override
 			public void run() {
 				if(view !=null){
 					view.destroyDrawingCache();

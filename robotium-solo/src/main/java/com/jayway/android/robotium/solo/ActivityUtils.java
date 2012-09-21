@@ -171,14 +171,18 @@ class ActivityUtils {
 	}
 
 	/**
-	 * Returns the current {@code Activity}, after sleeping a default pause length.
-	 *
+	 * Returns the current {@code Activity}, <em>without</em> sleeping for a
+	 * default pause length.
+	 * <p>
+	 * Use {@link #getCurrentActivity(boolean)} if you want to sleep before
+	 * returning.
+	 * 
 	 * @return the current {@code Activity}
-	 *
+	 * 
 	 */
 
 	public Activity getCurrentActivity() {
-		return getCurrentActivity(true);
+		return getCurrentActivity(false);
 	}
 	
 	/**
