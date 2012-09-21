@@ -81,7 +81,7 @@ class Waiter {
 			if(currentActivity != null && currentActivity.getClass().getSimpleName().equals(name))
 				return true;
 
-			currentActivity = activityUtils.getCurrentActivity();
+			currentActivity = activityUtils.getCurrentActivity(true);
 		}
 		return false;
 	}
