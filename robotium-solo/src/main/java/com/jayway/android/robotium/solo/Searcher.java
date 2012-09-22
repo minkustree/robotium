@@ -93,7 +93,8 @@ class Searcher {
 	public <T extends TextView> boolean searchFor(final Class<T> viewClass, final String regex, final int expectedMinimumNumberOfMatches, final boolean scroll, final boolean onlyVisible) {
 		final Callable<Collection<T>> viewFetcherCallback = new Callable<Collection<T>>() {
 			public Collection<T> call() throws Exception {
-				sleeper.sleep();
+				// not sure why the sleep is needed here?
+				//sleeper.sleep();
 
 				if(onlyVisible)
 					return RobotiumUtils.removeInvisibleViews(viewFetcher.getCurrentViews(viewClass));
