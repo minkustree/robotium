@@ -81,6 +81,7 @@ public class Solo {
 	protected final Waiter waiter;
 	protected final Setter setter;
 	protected final Getter getter;
+	protected final Instrumentation instrumentation;
 	protected final int TIMEOUT = 20000;
 	protected final int SMALLTIMEOUT = 10000;
 	public final static int LANDSCAPE = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;   // 0
@@ -121,6 +122,7 @@ public class Solo {
         this.clicker = new Clicker(activityUtils, viewFetcher, scroller,robotiumUtils, instrumentation, sleeper, waiter);
         this.presser = new Presser(clicker, instrumentation, sleeper, waiter);
         this.textEnterer = new TextEnterer(instrumentation, activityUtils, clicker);
+        this.instrumentation = instrumentation;
 	}
 
 	
@@ -540,6 +542,15 @@ public class Solo {
 	
 	public Activity getCurrentActivity() {
 		return activityUtils.getCurrentActivity();
+	}
+	
+	/**
+	 * Returns the {@link Instrumentation} object in use by this {@link Solo}.
+	 * 
+	 * @return the instance of {@link Instrumentation} used in construction.
+	 */
+	public Instrumentation getInstrumentation() {
+		return instrumentation;
 	}
 	
 	/**
