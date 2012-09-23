@@ -1064,7 +1064,11 @@ public class Solo {
 	 * @param fromY X coordinate of the initial touch, in screen coordinates
 	 * @param toY Y coordinate of the drag destination, in screen coordinates
 	 * @param stepCount How many move steps to include in the drag
-	 *
+	 * 
+	 * @throws SecurityException if we try and drag something we don't have
+	 * permission to inject events into. This usually means you're trying to 
+	 * send drag events to something outside your application, e.g. the 
+	 * pull-down status bar?
 	 */
 
 	public void drag(float fromX, float toX, float fromY, float toY, 

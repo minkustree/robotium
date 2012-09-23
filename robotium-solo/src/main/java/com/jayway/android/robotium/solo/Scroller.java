@@ -59,6 +59,10 @@ class Scroller {
 	 * @param toY Y coordinate of the drag destination, in screen coordinates
 	 * @param stepCount How many move steps to include in the drag
 	 *
+	 * @throws SecurityException if we try and drag something we don't have
+	 * permission to inject events into. This usually means you're trying to 
+	 * send drag events to something outside your application, e.g. the 
+	 * pull-down status bar?
 	 */
 
 	public void drag(float fromX, float toX, float fromY, float toY,
@@ -70,23 +74,17 @@ class Scroller {
 		float yStep = (toY - fromY) / stepCount;
 		float xStep = (toX - fromX) / stepCount;
 		MotionEvent event = MotionEvent.obtain(downTime, eventTime,MotionEvent.ACTION_DOWN, fromX, fromY, 0);
-		try {
-			inst.sendPointerSync(event);
-		} catch (SecurityException ignored) {}
+		inst.sendPointerSync(event);
 		for (int i = 0; i < stepCount; ++i) {
 			y += yStep;
 			x += xStep;
 			eventTime = SystemClock.uptimeMillis();
 			event = MotionEvent.obtain(downTime, eventTime,MotionEvent.ACTION_MOVE, x, y, 0);
-			try {
-				inst.sendPointerSync(event);
-			} catch (SecurityException ignored) {}
+			inst.sendPointerSync(event);
 		}
 		eventTime = SystemClock.uptimeMillis();
 		event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP,toX, toY, 0);
-		try {
-			inst.sendPointerSync(event);
-		} catch (SecurityException ignored) {}
+		inst.sendPointerSync(event);
 	}
 
 
